@@ -10,6 +10,8 @@ delta = {
         }
 
 
+
+
 def check_bound(scr_rect: pg.Rect, obj_rect: pg.Rect) -> tuple[bool, bool]:
     """
     オブジェクトが画面内か画面外かを判定して、真理値タプルを返す関数
@@ -23,6 +25,7 @@ def check_bound(scr_rect: pg.Rect, obj_rect: pg.Rect) -> tuple[bool, bool]:
     if obj_rect.top < scr_rect.top or obj_rect.bottom > scr_rect.bottom:
         tate = False
     return yoko, tate
+
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -41,6 +44,12 @@ def main():
     kk_rect = kk_img.get_rect()
     kk_rect.center = 600, 400
     tmr = 0
+    kk_delta = {
+        (-1,0):pg.transform.rotozoom(kk_img, 0, 0),
+        (0,-1):pg.transform.rotozoom(kk_img, 90, 0),
+        (1,0):pg.transform.rotozoom(kk_img, 180, 0),
+        (0,1):pg.transform.rotozoom(kk_img, 270, 0),
+    }
     
     while True:
         for event in pg.event.get():
@@ -50,14 +59,17 @@ def main():
         tmr += 1
         key_lst = pg.key.get_pressed()
         for k, mv in delta.items():
+            for delt, img in kk_delta.items():
+                if k == delt:
+                    kk_img = img
             if key_lst[k]:
                 kk_rect.move_ip(mv)
         if check_bound(screen.get_rect(), kk_rect) != (True, True):
             for k, mv in delta.items():
                 if key_lst[k]:
                     kk_rect.move_ip(-mv[0], -mv[1])
-        screen.blit(bg_img, [0, 0])
         screen.blit(kk_img, kk_rect)
+        screen.blit(bg_img, [0, 0])
         bb_rect.move_ip(vx,vy)
         yoko, tate = check_bound(screen.get_rect(), bb_rect)
         if not yoko:
