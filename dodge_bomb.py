@@ -43,6 +43,7 @@ def main():
     vx, vy = +1, +1
     kk_rect = kk_img.get_rect()
     kk_rect.center = 600, 400
+    a, b, c = 10, 20, 255
     tmr = 0
     kk_delta = {
         (-1,0):pg.transform.rotozoom(kk_img, 0, 0),
@@ -50,26 +51,34 @@ def main():
         (1,0):pg.transform.rotozoom(kk_img, 180, 0),
         (0,1):pg.transform.rotozoom(kk_img, 270, 0),
     }
+
     
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return 0
         
-        tmr += 1
+        tmr += 1 
+        a = tmr/10
+        b = tmr/10
+        c = 255-tmr/30
+        bb_img = pg.Surface((a*10, a*10))
+        pg.draw.circle(bb_img, (c, 0, 0), (b, b), b)  # tmrが100増えるごとに円の直径が大きくなっていく
+        bb_img.set_colorkey((0, 0, 0))
         key_lst = pg.key.get_pressed()
         for k, mv in delta.items():
-            for delt, img in kk_delta.items():
-                if k == delt:
-                    kk_img = img
             if key_lst[k]:
                 kk_rect.move_ip(mv)
         if check_bound(screen.get_rect(), kk_rect) != (True, True):
             for k, mv in delta.items():
                 if key_lst[k]:
                     kk_rect.move_ip(-mv[0], -mv[1])
-        screen.blit(kk_img, kk_rect)
         screen.blit(bg_img, [0, 0])
+        for k, mv in delta.items():
+            for delt, img in kk_delta.items():
+                if k == delt:
+                    kk_img = img
+        screen.blit(kk_img, kk_rect)
         bb_rect.move_ip(vx,vy)
         yoko, tate = check_bound(screen.get_rect(), bb_rect)
         if not yoko:
